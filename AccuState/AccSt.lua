@@ -78,8 +78,10 @@ end
 
 local function calculateCellsState()
 
-	-- Auszulesenede Werte müssen in 
-	-- der Fernsteuerung eingestellt werden
+	if mCellId == -1 then
+		return 0
+	end	
+
 	mCells = 0
 	local cells = getValue(mCellId)
 
@@ -117,7 +119,7 @@ local function calculateCellsState()
 	-- total result
 	mTotalCellsResult = math.ceil((mCellResult1 + mCellResult2) / 2.0)
 
-	return 0
+	return 1
 end
 
 local function drawTextAndBars()
@@ -165,10 +167,22 @@ local function warning()
 	return 1
 end
 
+local function bg_func()
+	-- bg_func is called periodically (always, the screen visibility does not matter)
+	return 0
+  end
+
 -- main methode it iterated 
 local function run_func(event)
 
-	calculateCellsState()
+	if calculateCellsState() == 0 then
+		mCellResult1 = 1
+		mCellResult2 = 1
+		mTotalCellsResult  = 1
+		mCells = mLipoTolalLow
+		mCell1 = mLipoCellVoltageLow
+		mCell2 = mLipoCellVoltageLow
+	end
 
 	lcd.clear()
 	drawTextAndBars()
@@ -181,4 +195,4 @@ local function run_func(event)
 	return 0
 end
 
-return { init=init, run=run_func }
+return { init=init, background=bg_func, run=run_func }
